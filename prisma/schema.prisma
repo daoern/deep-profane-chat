@@ -12,11 +12,14 @@ datasource db {
 
 model Board {
   id        Int     @id @default(autoincrement())
+  key       String   @unique
   name      String
+  title      String?
   createdAt DateTime  @default(now()) @map(name: "created_at")
   owner     User    @relation(fields: [ownerEmail], references: [email])
   ownerEmail   String
   comments  Comment[]
+  domain   String?
 }
 
 model Comment {
@@ -28,6 +31,7 @@ model Comment {
   content   String?
   createdAt DateTime  @default(now()) @map(name: "created_at")
   profane   Boolean @default(false)
+  deleted   Boolean  @default(false)
 }
 
 model User {

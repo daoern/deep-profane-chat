@@ -1,5 +1,7 @@
 import { getSession } from "next-auth/react";
 
+const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 export default async function handler(req, res) {
   const session = await getSession({ req });
 
@@ -12,10 +14,18 @@ export default async function handler(req, res) {
     return;
   }
 
+  const generateKey = (length) => {
+    var result = "";
+    for (var i = length; i > 0; --i)
+      result += chars[Math.floor(Math.random() * chars.length)];
+    return result;
+  };
+
   const newBoard = await prisma.board.create({
     data: {
       name: boardName,
       ownerEmail: session.user.email,
+      key: generateKey(32),
     },
   });
 

@@ -29,7 +29,7 @@ import React from "react";
 import Layout from "../../../components/layout";
 import prisma from "../../../lib/prisma";
 
-export default function BoardAdmin({ board }) {
+export default function BoardAdmin({ board, commentCount }) {
   return (
     <Layout>
       <VStack w="100%" align="left">
@@ -42,25 +42,25 @@ export default function BoardAdmin({ board }) {
         <Divider />
         <StatGroup>
           <Stat>
-            <StatLabel>All</StatLabel>
-            <StatNumber>56</StatNumber>
+            <StatLabel>Total</StatLabel>
+            <StatNumber>{commentCount.total}</StatNumber>
             <StatHelpText>comments</StatHelpText>
           </Stat>
           <Stat>
             <StatLabel>Flagged</StatLabel>
-            <StatNumber>2</StatNumber>
+            <StatNumber>{commentCount.flagged}</StatNumber>
             <StatHelpText>comments</StatHelpText>
           </Stat>
           <Stat>
-            <StatLabel>Moderated</StatLabel>
-            <StatNumber>2</StatNumber>
+            <StatLabel>Deleted</StatLabel>
+            <StatNumber>{commentCount.deleted}</StatNumber>
             <StatHelpText>comments</StatHelpText>
           </Stat>
         </StatGroup>
         <List>
           <ListItem>
             <ListIcon as={CheckCircleIcon} color="green.500" />
-            Comments are automatically flagged by DeepProfane.
+            Comments are automatically flagged for profanity.
           </ListItem>
         </List>
 
@@ -83,7 +83,7 @@ export default function BoardAdmin({ board }) {
                 <Td isNumeric>
                   <ButtonGroup size="sm" variant="ghost">
                     <Button colorScheme="red">Unflag</Button>
-                    <Button colorScheme="teal">Remove</Button>
+                    <Button colorScheme="teal">Delete</Button>
                   </ButtonGroup>
                 </Td>
               </Tr>
@@ -96,6 +96,15 @@ export default function BoardAdmin({ board }) {
           Integration
         </Heading>
         <Divider />
+        <Text>API Key of this board.</Text>
+        <Box
+          borderWidth="1px"
+          borderRadius="lg"
+          overflow="hidden"
+          padding="12px"
+        >
+          <Code>{board.key}</Code>
+        </Box>
         <Text>
           Copy paste the following code into your website to implement
           DeepProfane Chat.
@@ -106,22 +115,51 @@ export default function BoardAdmin({ board }) {
           overflow="hidden"
           padding="12px"
         >
-          <Code>wakak</Code>
+          <Code>{board.key}</Code>
         </Box>
+        <Box p="12px"></Box>
       </VStack>
     </Layout>
   );
 }
-
+{
+  /* <iframe
+  src="https://deep-profane.herokuapp.com/chat/1"
+  width="100%"
+  height="800"
+  frameborder="0"
+  referrerpolicy="no-referrer-when-downgrade"
+></iframe>; */
+}
 export async function getServerSideProps({ params }) {
   const board = await prisma.board.findUnique({
     where: {
       id: parseInt(params?.id),
     },
   });
+  const totalComment = await prisma.comment.count({
+    where: {
+      boardId: parseInt(params?.id),
+    },
+  });
+  const flaggedComment = await prisma.comment.count({
+    where: {
+      AND: [{ boardId: parseInt(params?.id) }, { profane: true }],
+    },
+  });
+  const deletedComment = await prisma.comment.count({
+    where: {
+      AND: [{ boardId: parseInt(params?.id) }, { deleted: true }],
+    },
+  });
   return {
     props: {
       board: JSON.parse(JSON.stringify(board)),
+      commentCount: {
+        total: totalComment,
+        flagged: flaggedComment,
+        deleted: deletedComment,
+      },
     },
   };
 }
