@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import Layout from "../../components/layout";
 import Link from "next/link";
+import prisma from "../../lib/prisma";
 
 export default function Dashboard({ boards }) {
   return (

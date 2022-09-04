@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import {
@@ -10,11 +10,20 @@ import {
   MenuList,
   Box,
 } from "@chakra-ui/react";
+import Login from "../pages/login";
 
 export default function AuthButton() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
   if (!session) {
-    return <Button onClick={() => signIn()}>Sign In</Button>;
+    return (
+      <Button
+        onClick={() => window.open("/login")}
+        isLoading={status === "loading"}
+      >
+        Sign In
+      </Button>
+    );
   }
   return (
     <Menu>
