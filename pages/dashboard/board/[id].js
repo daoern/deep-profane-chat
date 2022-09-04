@@ -106,7 +106,7 @@ export default function BoardAdmin({ board }) {
           overflow="hidden"
           padding="12px"
         >
-          <Code children="wakak"></Code>
+          <Code>wakak</Code>
         </Box>
       </VStack>
     </Layout>
