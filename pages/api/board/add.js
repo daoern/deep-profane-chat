@@ -24,6 +24,7 @@ export default async function handler(req, res) {
   const newBoard = await prisma.board.create({
     data: {
       name: boardName,
+      domain: boardDomain,
       ownerEmail: session.user.email,
       key: generateKey(32),
     },

@@ -11,11 +11,13 @@ import {
   Heading,
   Spacer,
   Tag,
+  Text,
   VStack,
 } from "@chakra-ui/react";
 import Layout from "../../components/layout";
 import Link from "next/link";
 import prisma from "../../lib/prisma";
+import { ArrowForwardIcon } from "@chakra-ui/icons";
 
 export default function Dashboard({ boards }) {
   return (
@@ -42,11 +44,20 @@ export default function Dashboard({ boards }) {
               borderWidth="1px"
               borderRadius="lg"
               overflow="hidden"
-              padding="12px"
+              padding="16px"
             >
               <Heading as="h4" size="md">
                 {board.name}
               </Heading>
+              <Text>{board.domain}</Text>
+              <Button
+                float="right"
+                rightIcon={<ArrowForwardIcon />}
+                colorScheme="teal"
+                variant="ghost"
+              >
+                View
+              </Button>
             </Box>
           </Link>
         ))}

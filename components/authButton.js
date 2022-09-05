@@ -12,13 +12,13 @@ import {
 } from "@chakra-ui/react";
 import Login from "../pages/login";
 
-export default function AuthButton() {
+export default function AuthButton({ usePopup = false }) {
   const { data: session, status } = useSession();
 
   if (!session) {
     return (
       <Button
-        onClick={() => window.open("/login")}
+        onClick={() => (usePopup ? window.open("/login") : signIn())}
         isLoading={status === "loading"}
       >
         Sign In

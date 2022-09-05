@@ -7,7 +7,7 @@ export default function Layout({ children }) {
     <>
       <Box w="100%" p={4} borderBottomWidth="2px">
         <Container>
-          <Flex>
+          <Flex alignItems="center">
             <Heading as="h4" size="md">
               DeepProfane Chat
             </Heading>

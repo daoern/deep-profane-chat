@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Divider,
   FormControl,
@@ -12,11 +13,12 @@ import Layout from "../../../components/layout";
 
 export default function BoardNew() {
   const [boardName, setBoardName] = useState("");
+  const [boardDomain, setBoardDomain] = useState("");
 
   const createBoard = async (e) => {
     e.preventDefault();
     try {
-      const body = { boardName: boardName, boardDomain: "" };
+      const body = { boardName: boardName, boardDomain: boardDomain };
       const response = await fetch("/api/board/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -50,11 +52,14 @@ export default function BoardNew() {
           </FormControl>
           <FormControl>
             <FormLabel>Board domain</FormLabel>
-            <Input placeholder="https://example.com" />
+            <Input
+              placeholder="https://example.com"
+              onChange={(e) => setBoardDomain(e.target.value)}
+              value={boardDomain}
+            />
           </FormControl>
-          <Button type="submit" marginY="24px">
-            Create
-          </Button>
+          <Box p="12px"></Box>
+          <Button type="submit">Create</Button>
         </VStack>
       </form>
     </Layout>

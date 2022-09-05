@@ -6,10 +6,13 @@ import {
   Center,
   Divider,
   Flex,
+  FormControl,
+  FormErrorMessage,
   Heading,
   HStack,
   Input,
   Spacer,
+  Text,
   VStack,
 } from "@chakra-ui/react";
 import { useRouter } from "next/router";
@@ -25,6 +28,7 @@ export default function Chat({ commentList, board }) {
   const [comments, setComments] = useState(commentList);
   const [commentInput, setCommentInput] = useState("");
   const [isPosting, setIsPosting] = useState(false);
+  const [isInputProfane, setIsInputProfane] = useState(false);
 
   const postComment = async (e) => {
     e.preventDefault();
@@ -38,8 +42,13 @@ export default function Chat({ commentList, board }) {
         body: JSON.stringify(body),
       });
       const newComment = await response.json();
-      setComments([newComment, ...comments]);
-      setCommentInput("");
+      if (newComment.profane) {
+        setIsInputProfane(true);
+      } else {
+        setComments([newComment, ...comments]);
+        setCommentInput("");
+        setIsInputProfane(false);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -54,12 +63,15 @@ export default function Chat({ commentList, board }) {
       overflow="hidden"
       padding="12px"
     >
-      <Flex>
+      <Flex alignItems="center" pb="12px">
         <Heading as="h3" size="lg">
           {board.name}
         </Heading>
+        <Text fontSize="xs" color="gray.400" pl="24px">
+          Powered by DeepProfane Chat
+        </Text>
         <Spacer />
-        <AuthButton />
+        <AuthButton usePopup={true} />
       </Flex>
       <Divider marginBottom="12px" />
       {comments.length === 0 ? (
@@ -68,7 +80,7 @@ export default function Chat({ commentList, board }) {
         </Box>
       ) : (
         <Box maxH="sm" overflowY="scroll">
-          <VStack spacing="12px">
+          <VStack spacing="16px">
             {comments.map((comment) => (
               <Message
                 key={comment.id}
@@ -82,13 +94,22 @@ export default function Chat({ commentList, board }) {
       )}
       <Divider my="12px" />
       <form onSubmit={postComment}>
-        <HStack>
-          <Input
-            placeholder="Enter comment"
-            onChange={(e) => setCommentInput(e.target.value)}
-            value={commentInput}
-            disabled={isPosting}
-          />
+        <HStack align="top">
+          <FormControl isInvalid={isInputProfane}>
+            <Input
+              placeholder="Enter comment"
+              onChange={(e) => setCommentInput(e.target.value)}
+              value={commentInput}
+              disabled={isPosting}
+            />
+            {isInputProfane ? (
+              <FormErrorMessage>
+                Your comment contains profanity!
+              </FormErrorMessage>
+            ) : (
+              <></>
+            )}
+          </FormControl>
           <Button type="submit" isLoading={isPosting}>
             Publish
           </Button>
@@ -107,7 +128,7 @@ export async function getServerSideProps({ params }) {
 
   const comments = await prisma.comment.findMany({
     where: {
-      boardId: board.id,
+      AND: [{ boardId: board.id }, { profane: false }, { deleted: false }],
     },
     include: {
       user: {

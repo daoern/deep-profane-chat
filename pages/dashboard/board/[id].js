@@ -29,7 +29,7 @@ import React from "react";
 import Layout from "../../../components/layout";
 import prisma from "../../../lib/prisma";
 
-export default function BoardAdmin({ board, commentCount }) {
+export default function BoardAdmin({ board, commentCount, flaggedComments }) {
   return (
     <Layout>
       <VStack w="100%" align="left">
@@ -47,15 +47,15 @@ export default function BoardAdmin({ board, commentCount }) {
             <StatHelpText>comments</StatHelpText>
           </Stat>
           <Stat>
-            <StatLabel>Flagged</StatLabel>
+            <StatLabel>Blocked</StatLabel>
             <StatNumber>{commentCount.flagged}</StatNumber>
             <StatHelpText>comments</StatHelpText>
           </Stat>
-          <Stat>
+          {/* <Stat>
             <StatLabel>Deleted</StatLabel>
             <StatNumber>{commentCount.deleted}</StatNumber>
             <StatHelpText>comments</StatHelpText>
-          </Stat>
+          </Stat> */}
         </StatGroup>
         <List>
           <ListItem>
@@ -73,20 +73,26 @@ export default function BoardAdmin({ board, commentCount }) {
           <Table>
             <Thead>
               <Tr>
-                <Th>Flagged comment</Th>
-                <Th isNumeric>Action</Th>
+                <Th pl={0}>Blocked comment</Th>
+                {/* <Th isNumeric pr={0}>
+                  Action
+                </Th> */}
               </Tr>
             </Thead>
             <Tbody>
-              <Tr>
-                <Td>Comment</Td>
-                <Td isNumeric>
-                  <ButtonGroup size="sm" variant="ghost">
-                    <Button colorScheme="red">Unflag</Button>
-                    <Button colorScheme="teal">Delete</Button>
-                  </ButtonGroup>
-                </Td>
-              </Tr>
+              {flaggedComments.map((comment) => (
+                <Tr>
+                  <Td pl={0} color="gray.500">
+                    {comment.content}
+                  </Td>
+                  {/* <Td isNumeric pr={0}>
+                    <ButtonGroup size="sm" variant="ghost">
+                      <Button colorScheme="red">Unflag</Button>
+                      <Button colorScheme="teal">Delete</Button>
+                    </ButtonGroup>
+                  </Td> */}
+                </Tr>
+              ))}
             </Tbody>
           </Table>
         </TableContainer>
@@ -152,6 +158,15 @@ export async function getServerSideProps({ params }) {
       AND: [{ boardId: parseInt(params?.id) }, { deleted: true }],
     },
   });
+  const flaggedComments = await prisma.comment.findMany({
+    where: {
+      AND: [
+        { boardId: parseInt(params?.id) },
+        { profane: true },
+        { deleted: false },
+      ],
+    },
+  });
   return {
     props: {
       board: JSON.parse(JSON.stringify(board)),
@@ -160,6 +175,7 @@ export async function getServerSideProps({ params }) {
         flagged: flaggedComment,
         deleted: deletedComment,
       },
+      flaggedComments: JSON.parse(JSON.stringify(flaggedComments)),
     },
   };
 }
