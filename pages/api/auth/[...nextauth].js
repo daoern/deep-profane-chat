@@ -22,7 +22,7 @@ export default NextAuth({
         await prisma.user.create({
           data: {
             email: user.email,
-            name: "Test",
+            name: user.name,
           },
         });
       } catch (e) {

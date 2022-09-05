@@ -13,13 +13,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  console.log(
-    "https://deep-profane-rest.azurewebsites.net/profane_prob?" +
-      new URLSearchParams({
-        msg: [comment],
-      })
-  );
-  const response = await fetch("http://127.0.0.1:80/is_profane", {
+  const response = await fetch("http://207.148.125.180/is_profane", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ msg: [comment] }),
