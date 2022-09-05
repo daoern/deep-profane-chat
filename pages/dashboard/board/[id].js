@@ -81,7 +81,7 @@ export default function BoardAdmin({ board, commentCount, flaggedComments }) {
             </Thead>
             <Tbody>
               {flaggedComments.map((comment) => (
-                <Tr>
+                <Tr key={comment.id}>
                   <Td pl={0} color="gray.500">
                     {comment.content}
                   </Td>
