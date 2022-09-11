@@ -16,12 +16,20 @@ export default function Message(props) {
       <Avatar name={props.userName} src="https://bit.ly/broken-link" />
 
       <VStack align="left">
-        <HStack>
+        <HStack align="top">
           <Heading as="h5" size="sm">
             {props.userName}
           </Heading>
           <Text fontSize="sm" color="gray.500">
-            {props.date.toLocaleString()}
+            {new Date(props.date).toLocaleDateString("en-GB", {
+              second: "numeric",
+              minute: "numeric",
+              hour: "numeric",
+              year: "numeric",
+              month: "numeric",
+              day: "numeric",
+              hour12: true,
+            })}
           </Text>
         </HStack>
 

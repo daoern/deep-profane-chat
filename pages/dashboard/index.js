@@ -36,7 +36,6 @@ export default function Dashboard({ boards }) {
           <Button my="24px">Create new</Button>
         </Link>
       </Flex>
-      <Divider mb="12px" />
       <VStack w="100%" align="left">
         {boards.map((board) => (
           <Link key={board.id} href={`dashboard/board/${board.id}`}>

@@ -14,20 +14,30 @@ import Layout from "../../../components/layout";
 export default function BoardNew() {
   const [boardName, setBoardName] = useState("");
   const [boardDomain, setBoardDomain] = useState("");
+  const [boardTitle, setBoardTitle] = useState("");
+
+  const [isCreating, setIsCreating] = useState(false);
 
   const createBoard = async (e) => {
     e.preventDefault();
+    setIsCreating(true);
     try {
-      const body = { boardName: boardName, boardDomain: boardDomain };
+      const body = {
+        boardName: boardName,
+        boardTitle: boardTitle,
+        boardDomain: boardDomain,
+      };
       const response = await fetch("/api/board/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      alert("done!");
+      const newBoard = await response.json();
+      window.location.href = `/dashboard/board/${newBoard.id}`;
     } catch (error) {
       console.error(error);
     }
+    setIsCreating(false);
   };
 
   return (
@@ -41,13 +51,21 @@ export default function BoardNew() {
           <Heading as="h4" size="md">
             Board details
           </Heading>
-          <Divider />
+          <Box py="12px"></Box>
           <FormControl isRequired>
             <FormLabel>Board name</FormLabel>
             <Input
               placeholder="Sample board"
               onChange={(e) => setBoardName(e.target.value)}
               value={boardName}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Board title</FormLabel>
+            <Input
+              placeholder="Comments"
+              onChange={(e) => setBoardTitle(e.target.value)}
+              value={boardTitle}
             />
           </FormControl>
           <FormControl>
@@ -58,8 +76,11 @@ export default function BoardNew() {
               value={boardDomain}
             />
           </FormControl>
-          <Box p="12px"></Box>
-          <Button type="submit">Create</Button>
+          <Box py="12px">
+            <Button float="right" type="submit" isLoading={isCreating}>
+              Create
+            </Button>
+          </Box>
         </VStack>
       </form>
     </Layout>

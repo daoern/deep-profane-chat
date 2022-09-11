@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { ChevronDownIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, ExternalLinkIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Button,
@@ -9,6 +9,7 @@ import {
   MenuItem,
   MenuList,
   Box,
+  Link,
 } from "@chakra-ui/react";
 import Login from "../pages/login";
 
@@ -35,11 +36,15 @@ export default function AuthButton({ usePopup = false }) {
         _hover={{ bg: "transparent" }}
         _expanded={{ bg: "transparent" }}
       >
-        <Avatar size="sm" name={session.user.email} />
+        <Avatar size="sm" name={session.user.name} />
       </MenuButton>
       <MenuList>
         <Box p="12px">{session.user.email}</Box>
-        <MenuItem>Profile</MenuItem>
+        <MenuItem>
+          <Link href="http://localhost:3000/dashboard" isExternal={usePopup}>
+            Dashboard {usePopup ? <ExternalLinkIcon mx="2px" /> : <></>}
+          </Link>
+        </MenuItem>
         <MenuItem onClick={() => signOut()}>Sign out</MenuItem>
       </MenuList>
     </Menu>

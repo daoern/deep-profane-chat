@@ -1,129 +1,172 @@
-import { CheckCircleIcon } from "@chakra-ui/icons";
+import { CheckCircleIcon, UpDownIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
-  ButtonGroup,
   Code,
   Divider,
+  Flex,
   Heading,
-  List,
-  ListIcon,
-  ListItem,
-  Stat,
-  StatGroup,
-  StatHelpText,
-  StatLabel,
-  StatNumber,
-  Table,
-  TableCaption,
-  TableContainer,
-  Tbody,
-  Td,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Spacer,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
-  Th,
-  Thead,
-  Tr,
   VStack,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
+import Integration from "../../../components/integration";
 import Layout from "../../../components/layout";
+import Moderation from "../../../components/moderation";
+import Overview from "../../../components/overview";
 import prisma from "../../../lib/prisma";
 
 export default function BoardAdmin({ board, commentCount, flaggedComments }) {
+  const {
+    isOpen: isInstallOpen,
+    onOpen: onInstallOpen,
+    onClose: onInstallClose,
+  } = useDisclosure();
+  const {
+    isOpen: isDeleteOpen,
+    onOpen: onDeleteOpen,
+    onClose: onDeleteClose,
+  } = useDisclosure();
+  const cancelRef = React.useRef();
+
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const deleteBoard = async () => {
+    if (isDeleting) {
+      return;
+    }
+    setIsDeleting(true);
+    try {
+      const body = {
+        boardId: board.id,
+      };
+      const response = await fetch("/api/board/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      window.location.href = `/dashboard`;
+    } catch (error) {
+      console.error(error);
+    }
+    setIsDeleting(false);
+  };
+
   return (
     <Layout>
       <VStack w="100%" align="left">
-        <Heading as="h3" size="lg" my="24px">
-          {board.name}
-        </Heading>
-        <Heading as="h4" size="md">
-          Overview
-        </Heading>
-        <Divider />
-        <StatGroup>
-          <Stat>
-            <StatLabel>Total</StatLabel>
-            <StatNumber>{commentCount.total}</StatNumber>
-            <StatHelpText>comments</StatHelpText>
-          </Stat>
-          <Stat>
-            <StatLabel>Blocked</StatLabel>
-            <StatNumber>{commentCount.flagged}</StatNumber>
-            <StatHelpText>comments</StatHelpText>
-          </Stat>
-          {/* <Stat>
-            <StatLabel>Deleted</StatLabel>
-            <StatNumber>{commentCount.deleted}</StatNumber>
-            <StatHelpText>comments</StatHelpText>
-          </Stat> */}
-        </StatGroup>
-        <List>
-          <ListItem>
-            <ListIcon as={CheckCircleIcon} color="green.500" />
-            Comments are automatically flagged for profanity.
-          </ListItem>
-        </List>
+        <Flex alignItems="center">
+          <Heading as="h3" size="lg" my="24px">
+            {board.name}
+          </Heading>
+          <Spacer />
+          <Button colorScheme="teal" onClick={onInstallOpen}>
+            Install
+          </Button>
+          <Menu>
+            <MenuButton
+              _active={{ bg: "transparent" }}
+              _hover={{ bg: "transparent" }}
+              _expanded={{ bg: "transparent" }}
+              background="transparent"
+              as={Button}
+              rightIcon={<UpDownIcon />}
+            ></MenuButton>
+            <MenuList>
+              <MenuItem onClick={onDeleteOpen}>Delete board</MenuItem>
+            </MenuList>
+          </Menu>
+        </Flex>
+        {}
 
-        <Box p="12px"></Box>
-        <Heading as="h4" size="md">
-          Moderation
-        </Heading>
-        <Divider />
-        <TableContainer>
-          <Table>
-            <Thead>
-              <Tr>
-                <Th pl={0}>Blocked comment</Th>
-                {/* <Th isNumeric pr={0}>
-                  Action
-                </Th> */}
-              </Tr>
-            </Thead>
-            <Tbody>
-              {flaggedComments.map((comment) => (
-                <Tr key={comment.id}>
-                  <Td pl={0} color="gray.500">
-                    {comment.content}
-                  </Td>
-                  {/* <Td isNumeric pr={0}>
-                    <ButtonGroup size="sm" variant="ghost">
-                      <Button colorScheme="red">Unflag</Button>
-                      <Button colorScheme="teal">Delete</Button>
-                    </ButtonGroup>
-                  </Td> */}
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
+        <Tabs isLazy>
+          <TabList>
+            <Tab>Overview</Tab>
+            <Tab>Moderation</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <Overview board={board} commentCount={commentCount} />
+            </TabPanel>
+            <TabPanel>
+              <Moderation flaggedComments={flaggedComments} />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
 
-        <Box p="12px"></Box>
-        <Heading as="h4" size="md">
-          Integration
-        </Heading>
-        <Divider />
-        <Text>API Key of this board.</Text>
-        <Box
-          borderWidth="1px"
-          borderRadius="lg"
-          overflow="hidden"
-          padding="12px"
+        <Modal isOpen={isInstallOpen} onClose={onInstallClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Integration</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Integration board={board} />
+            </ModalBody>
+
+            <ModalFooter>
+              <Button colorScheme="teal" mr={3} onClick={onInstallClose}>
+                Close
+              </Button>
+              <Button variant="ghost">Copy HTML</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+
+        <AlertDialog
+          isOpen={isDeleteOpen}
+          leastDestructiveRef={cancelRef}
+          onClose={onDeleteClose}
         >
-          <Code>{board.key}</Code>
-        </Box>
-        <Text>
-          Copy paste the following code into your website to implement
-          DeepProfane Chat.
-        </Text>
-        <Box
-          borderWidth="1px"
-          borderRadius="lg"
-          overflow="hidden"
-          padding="12px"
-        >
-          <Code>{board.key}</Code>
-        </Box>
-        <Box p="12px"></Box>
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                Delete Board
+              </AlertDialogHeader>
+
+              <AlertDialogBody>
+                Are you sure? You can't undo this action afterwards.
+              </AlertDialogBody>
+
+              <AlertDialogFooter>
+                <Button ref={cancelRef} onClick={onDeleteClose}>
+                  Cancel
+                </Button>
+                <Button
+                  colorScheme="red"
+                  onClick={deleteBoard}
+                  ml={3}
+                  isLoading={isDeleting}
+                >
+                  Delete
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
       </VStack>
     </Layout>
   );

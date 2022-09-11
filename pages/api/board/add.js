@@ -5,7 +5,7 @@ const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 export default async function handler(req, res) {
   const session = await getSession({ req });
 
-  const { boardName, boardDomain } = req.body;
+  const { boardName, boardTitle, boardDomain } = req.body;
 
   if (!session) {
     res.status(500).send({
@@ -24,6 +24,7 @@ export default async function handler(req, res) {
   const newBoard = await prisma.board.create({
     data: {
       name: boardName,
+      title: boardTitle,
       domain: boardDomain,
       ownerEmail: session.user.email,
       key: generateKey(32),
