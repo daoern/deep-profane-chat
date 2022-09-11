@@ -1,4 +1,5 @@
 import { getSession } from "next-auth/react";
+import prisma from "../../../lib/prisma";
 
 const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 

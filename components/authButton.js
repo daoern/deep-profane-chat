@@ -41,7 +41,7 @@ export default function AuthButton({ usePopup = false }) {
       <MenuList>
         <Box p="12px">{session.user.email}</Box>
         <MenuItem>
-          <Link href="http://localhost:3000/dashboard" isExternal={usePopup}>
+          <Link href="/dashboard" isExternal={usePopup}>
             Dashboard {usePopup ? <ExternalLinkIcon mx="2px" /> : <></>}
           </Link>
         </MenuItem>
