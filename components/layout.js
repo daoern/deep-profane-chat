@@ -14,7 +14,7 @@ export default function Layout({ children }) {
   return (
     <>
       <Box w="100%" p={4} borderBottomWidth="2px">
-        <Container minW="container.sm">
+        <Container>
           <Flex alignItems="center">
             <Image
               width="32px"
@@ -31,7 +31,7 @@ export default function Layout({ children }) {
           </Flex>
         </Container>
       </Box>
-      <Container minW="container.sm" mb="24">
+      <Container mb="24">
         <main>{children}</main>
       </Container>
     </>
