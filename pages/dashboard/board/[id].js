@@ -148,7 +148,7 @@ export default function BoardAdmin({ board, commentCount, flaggedComments }) {
               </AlertDialogHeader>
 
               <AlertDialogBody>
-                Are you sure? You can't undo this action afterwards.
+                Are you sure? You can&#39;t undo this action afterwards.
               </AlertDialogBody>
 
               <AlertDialogFooter>

@@ -32,7 +32,7 @@ export default function Login({ providers }) {
         window.location.href = callbackUrl;
       }
     }
-  }, [session, loading]);
+  }, [session, loading, callbackUrl]);
   return (
     <Container pt="40">
       <VStack>
